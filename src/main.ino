@@ -2,6 +2,9 @@
 #include <LV_Helper.h>
 
 const uint32_t screenTimeout = 10000;
+const char *ntpServer1 = "pool.ntp.org";
+const char *ntpServer2 = "time.nist.gov";
+const int timezone = +8;
 
 lv_obj_t *timeLabel, *dateLabel;
 
@@ -18,6 +21,8 @@ void setup()
 	dateLabel = lv_label_create(lv_scr_act());
 	lv_obj_align(dateLabel, LV_ALIGN_CENTER, 0, 48);
 	lv_obj_set_style_text_font(dateLabel, &lv_font_montserrat_24, LV_PART_MAIN);
+
+	configTime(timezone * 3600, 0, ntpServer1, ntpServer2);
 }
 
 void loop()
