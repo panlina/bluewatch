@@ -3,15 +3,21 @@
 
 const uint32_t screenTimeout = 10000;
 
+lv_obj_t *timeLabel, *dateLabel;
+
 void setup()
 {
 	Serial.begin(115200);
 	watch.begin();
 	beginLvglHelper();
 
-	lv_obj_t *label = lv_label_create(lv_scr_act());
-	lv_obj_center(label);
-	lv_label_set_text(label, "bluewatch");
+	timeLabel = lv_label_create(lv_scr_act());
+	lv_obj_center(timeLabel);
+	lv_obj_set_style_text_font(timeLabel, &lv_font_montserrat_48, LV_PART_MAIN);
+
+	dateLabel = lv_label_create(lv_scr_act());
+	lv_obj_align(dateLabel, LV_ALIGN_CENTER, 0, 48);
+	lv_obj_set_style_text_font(dateLabel, &lv_font_montserrat_24, LV_PART_MAIN);
 }
 
 void loop()
@@ -19,7 +25,29 @@ void loop()
 	lv_task_handler();
 	if (lv_disp_get_inactive_time(NULL) >= screenTimeout)
 		enterLightSleep();
+
+	static unsigned long timeLastUpdateTime;
+	auto now = millis();
+	if (now - timeLastUpdateTime >= 1000) {
+		updateTime();
+		timeLastUpdateTime = now;
+	}
+
 	delay(5);
+}
+
+void updateTime()
+{
+	tm timeinfo;
+	if (!getLocalTime(&timeinfo)) {
+		Serial.println("Failed to obtain time.");
+		return;
+	}
+	char s[16];
+	strftime(s, 16, "%X", &timeinfo);
+	lv_label_set_text(timeLabel, s);
+	strftime(s, 16, "%a %x", &timeinfo);
+	lv_label_set_text(dateLabel, s);
 }
 
 void enterLightSleep()
