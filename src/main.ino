@@ -11,6 +11,8 @@ const char *wifiPassword = "(password)";
 
 lv_obj_t *timeLabel, *dateLabel;
 
+unsigned long timeLastUpdateTime;
+
 void setup()
 {
 	Serial.begin(115200);
@@ -28,6 +30,10 @@ void setup()
 	configTime(timezone * 3600, 0, ntpServer1, ntpServer2);
 
 	WiFi.begin(wifiSsid, wifiPassword);
+
+	auto now = millis();
+	updateTime();
+	timeLastUpdateTime = now;
 }
 
 void loop()
@@ -36,7 +42,6 @@ void loop()
 	if (lv_disp_get_inactive_time(NULL) >= screenTimeout)
 		enterLightSleep();
 
-	static unsigned long timeLastUpdateTime;
 	auto now = millis();
 	if (now - timeLastUpdateTime >= 1000) {
 		updateTime();
