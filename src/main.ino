@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include "ui.h"
 #include "js.h"
+#include "jsServer.h"
 
 const uint32_t screenTimeout = 10000;
 const char *ntpServer1 = "pool.ntp.org";
@@ -24,6 +25,7 @@ void setup()
 	WiFi.begin(wifiSsid, wifiPassword);
 
 	setupJs();
+	setupJsServer();
 }
 
 void loop()
@@ -33,6 +35,7 @@ void loop()
 		enterLightSleep();
 
 	watchfaceHandler();
+	jsServer.handleClient();
 
 	delay(5);
 }
