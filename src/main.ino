@@ -2,6 +2,7 @@
 #include <LV_Helper.h>
 #include <WiFi.h>
 #include "ui.h"
+#include "js.h"
 
 const uint32_t screenTimeout = 10000;
 const char *ntpServer1 = "pool.ntp.org";
@@ -21,6 +22,8 @@ void setup()
 	configTime(timezone * 3600, 0, ntpServer1, ntpServer2);
 
 	WiFi.begin(wifiSsid, wifiPassword);
+
+	setupJs();
 }
 
 void loop()
