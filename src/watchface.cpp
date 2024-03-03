@@ -1,7 +1,7 @@
 #include <LilyGoLib.h>
 #include <WiFi.h>
 
-lv_obj_t *timeLabel, *dateLabel, *statusBar, *batteryLabel, *wifiLabel;
+lv_obj_t *watchface, *timeLabel, *dateLabel, *statusBar, *batteryLabel, *wifiLabel;
 
 unsigned long timeLastUpdateTime;
 unsigned long batteryLastUpdateTime;
@@ -12,15 +12,19 @@ void updateWifiStatus();
 
 void setupWatchface()
 {
-	timeLabel = lv_label_create(lv_scr_act());
+	watchface = lv_obj_create(lv_scr_act());
+	lv_obj_set_size(watchface, LV_PCT(100), LV_PCT(100));
+	lv_obj_set_style_pad_all(watchface, 0, 0);
+
+	timeLabel = lv_label_create(watchface);
 	lv_obj_center(timeLabel);
 	lv_obj_set_style_text_font(timeLabel, &lv_font_montserrat_48, LV_PART_MAIN);
 
-	dateLabel = lv_label_create(lv_scr_act());
+	dateLabel = lv_label_create(watchface);
 	lv_obj_align(dateLabel, LV_ALIGN_CENTER, 0, 48);
 	lv_obj_set_style_text_font(dateLabel, &lv_font_montserrat_24, LV_PART_MAIN);
 
-	statusBar = lv_obj_create(lv_scr_act());
+	statusBar = lv_obj_create(watchface);
 	lv_obj_set_width(statusBar, LV_PCT(100));
 	lv_obj_set_height(statusBar, LV_SIZE_CONTENT);
 	lv_obj_set_style_pad_all(statusBar, 4, LV_PART_MAIN);
