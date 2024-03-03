@@ -1,0 +1,2 @@
+void setupWatchface();
+void watchfaceHandler();
