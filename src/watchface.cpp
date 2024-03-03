@@ -12,7 +12,8 @@ void updateWifiStatus();
 
 void setupWatchface()
 {
-	watchface = lv_obj_create(lv_scr_act());
+	extern lv_obj_t *watchfaceTile;
+	watchface = lv_obj_create(watchfaceTile);
 	lv_obj_set_size(watchface, LV_PCT(100), LV_PCT(100));
 	lv_obj_set_style_pad_all(watchface, 0, 0);
 

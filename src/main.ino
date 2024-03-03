@@ -10,13 +10,24 @@ const int timezone = +8;
 const char *wifiSsid = "(ssid)";
 const char *wifiPassword = "(password)";
 
+lv_obj_t *tileview, *watchfaceTile, *appsTile;
+
 void setup()
 {
 	Serial.begin(115200);
 	watch.begin();
 	beginLvglHelper();
 
+	tileview = lv_tileview_create(lv_scr_act());
+	lv_obj_set_scrollbar_mode(tileview, LV_SCROLLBAR_MODE_OFF);
+
+	watchfaceTile = lv_tileview_add_tile(tileview, 0, 0, LV_DIR_HOR);
 	setupWatchface();
+
+	appsTile = lv_tileview_add_tile(tileview, 1, 0, LV_DIR_HOR);
+	lv_obj_t *label = lv_label_create(appsTile);
+	lv_label_set_text(label, "(Apps)");
+	lv_obj_center(label);
 
 	configTime(timezone * 3600, 0, ntpServer1, ntpServer2);
 
