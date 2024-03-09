@@ -20,4 +20,7 @@ void duktape_watch_install(duk_context *ctx) {
 	duk_put_global_string(ctx, "print");
 	duk_push_c_function(ctx, js_vibrate, 0);
 	duk_put_global_string(ctx, "vibrate");
+
+	void duktape_watch_install_http(duk_context *ctx);
+	duktape_watch_install_http(ctx);
 }
