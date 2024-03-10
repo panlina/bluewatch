@@ -30,9 +30,63 @@ static void createApp(lv_obj_t *parent, const char *name, const char *source)
 		btn,
 		[](lv_event_t *e) {
 			auto source = (const char *)lv_event_get_user_data(e);
-			evalJs(source);
+			void enterApp(const char *source);
+			enterApp(source);
 		},
 		LV_EVENT_CLICKED,
 		(void *)source
 	);
+}
+
+extern lv_obj_t *tileview, *appsTile;
+lv_obj_t *appTile;
+void enterAppTile();
+void (*onLeaveAppTile)();
+
+void enterApp(const char *source) {
+	onLeaveAppTile = []() {
+		duk_push_global_stash(jsContext);
+		if (duk_get_prop_string(jsContext, -1, "app_cleanup")) {
+			duk_call(jsContext, 0);
+			duk_pop(jsContext);
+			duk_del_prop_string(jsContext, -1, "app_cleanup");
+			duk_pop(jsContext);
+		}
+	};
+	enterAppTile();
+	duk_push_pointer(jsContext, appTile);
+	duk_put_global_string(jsContext, "appTile");
+	auto s = "(function(){" + String(source) + "})()";
+	duk_push_string(jsContext, s.c_str());
+	auto rc = duk_peval(jsContext);
+	if (rc) {
+		duk_safe_to_stacktrace(jsContext, -1);
+		auto stacktrace = duk_get_string(jsContext, -1);
+		auto label = lv_label_create(appTile);
+		lv_obj_set_align(label, LV_ALIGN_CENTER);
+		lv_label_set_text(label, stacktrace);
+	} else
+		if (duk_is_function(jsContext, -1)) {
+			duk_push_global_stash(jsContext);
+			duk_dup(jsContext, -2);
+			duk_put_prop_string(jsContext, -2, "app_cleanup");
+			duk_pop(jsContext);
+		}
+	duk_pop(jsContext);
+}
+
+void enterAppTile() {
+	appTile = lv_tileview_add_tile(tileview, 2, 0, LV_DIR_HOR);
+	lv_obj_set_tile_id(tileview, 2, 0, LV_ANIM_ON);
+
+	lv_obj_add_event_cb(tileview, [](lv_event_t *e) {
+		lv_obj_remove_event_cb_with_user_data(tileview, nullptr, appTile);
+		lv_obj_add_event_cb(tileview, [](lv_event_t *e) {
+			if (lv_tileview_get_tile_act(tileview) != appsTile) return;
+			lv_obj_remove_event_cb_with_user_data(tileview, nullptr, appsTile);
+			(*onLeaveAppTile)();
+			lv_obj_del(appTile);
+			appTile = nullptr;
+		}, LV_EVENT_SCROLL_END, appsTile);
+	}, LV_EVENT_SCROLL_END, appTile);
 }
