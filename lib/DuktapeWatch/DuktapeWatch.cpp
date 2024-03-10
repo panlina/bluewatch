@@ -23,4 +23,6 @@ void duktape_watch_install(duk_context *ctx) {
 
 	void duktape_watch_install_http(duk_context *ctx);
 	duktape_watch_install_http(ctx);
+	void duktape_watch_install_wifi(duk_context *ctx);
+	duktape_watch_install_wifi(ctx);
 }
