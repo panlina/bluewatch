@@ -15,11 +15,19 @@ static duk_ret_t js_vibrate(duk_context *ctx) {
 	return 0;
 }
 
+static duk_ret_t js_delay(duk_context *ctx) {
+	auto ms = duk_get_uint(ctx, 0);
+	delay(ms);
+	return 0;
+}
+
 void duktape_watch_install(duk_context *ctx) {
 	duk_push_c_function(ctx, js_print, DUK_VARARGS);
 	duk_put_global_string(ctx, "print");
 	duk_push_c_function(ctx, js_vibrate, 0);
 	duk_put_global_string(ctx, "vibrate");
+	duk_push_c_function(ctx, js_delay, 1);
+	duk_put_global_string(ctx, "delay");
 
 	void duktape_watch_install_http(duk_context *ctx);
 	duktape_watch_install_http(ctx);
