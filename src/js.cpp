@@ -2,6 +2,7 @@
 #include <duktape.h>
 #include <duktape_lvgl.h>
 #include <DuktapeWatch.h>
+#include <SPIFFS.h>
 
 duk_context *jsContext;
 
@@ -10,6 +11,19 @@ void setupJs()
 	jsContext = duk_create_heap_default();
 	duktape_lvgl_install(jsContext);
 	duktape_watch_install(jsContext);
+	void loadLibraries();
+	loadLibraries();
+}
+
+void loadLibraries()
+{
+    auto dir = SPIFFS.open("/library");
+	while (auto file = dir.openNextFile()) {
+		auto source = file.readString();
+		duk_push_string(jsContext, source.c_str());
+		auto rc = duk_peval(jsContext);
+		duk_pop(jsContext);
+	}
 }
 
 const char *evalJs(const char *code)
