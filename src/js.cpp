@@ -1,5 +1,6 @@
 #include <LilyGoLib.h>
 #include <duktape.h>
+#include <duktape_lvgl.h>
 #include <DuktapeWatch.h>
 
 duk_context *jsContext;
@@ -7,6 +8,7 @@ duk_context *jsContext;
 void setupJs()
 {
 	jsContext = duk_create_heap_default();
+	duktape_lvgl_install(jsContext);
 	duktape_watch_install(jsContext);
 }
 
