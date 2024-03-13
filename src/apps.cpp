@@ -1,9 +1,10 @@
 #include <LilyGoLib.h>
 #include "js.h"
+#include <SPIFFS.h>
 
 extern lv_obj_t *appsTile;
 static lv_obj_t *list;
-static void createApp(const char *name, const char *source);
+static void loadApps();
 
 void setupApps()
 {
@@ -11,12 +12,21 @@ void setupApps()
 	lv_obj_set_size(list, LV_PCT(100), LV_PCT(100));
 	lv_obj_set_flex_flow(list, LV_FLEX_FLOW_ROW_WRAP);
 	lv_obj_align(list, LV_ALIGN_CENTER, 0, 0);
-
-	createApp("print", "print('abc');");
-	createApp("vibrate", "vibrate();");
+	loadApps();
 }
 
-static void createApp(const char *name, const char *source)
+static void createApp(const char *name);
+
+static void loadApps()
+{
+    auto dir = SPIFFS.open("/app");
+	while (auto file = dir.openNextFile()) {
+		String name = file.name();
+		createApp(name.substring(0, name.length() - 3).c_str());	// remove ".js"
+	}
+}
+
+static void createApp(const char *name)
 {
 	lv_obj_t *btn = lv_btn_create(list);
 	lv_obj_set_size(btn, 100, 100);
@@ -30,12 +40,15 @@ static void createApp(const char *name, const char *source)
 	lv_obj_add_event_cb(
 		btn,
 		[](lv_event_t *e) {
-			auto source = (const char *)lv_event_get_user_data(e);
+			auto name = (String *)lv_event_get_user_data(e);
+			auto file = SPIFFS.open("/app/" + *name + ".js");
+			auto source = file.readString();
+			file.close();
 			void enterApp(const char *source);
-			enterApp(source);
+			enterApp(source.c_str());
 		},
 		LV_EVENT_CLICKED,
-		(void *)source
+		new String(name)
 	);
 }
 
