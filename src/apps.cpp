@@ -1,23 +1,24 @@
 #include <LilyGoLib.h>
 #include "js.h"
 
-static void createApp(lv_obj_t *parent, const char *name, const char *source);
+extern lv_obj_t *appsTile;
+static lv_obj_t *list;
+static void createApp(const char *name, const char *source);
 
 void setupApps()
 {
-	extern lv_obj_t *appsTile;
-	lv_obj_t *list = lv_obj_create(appsTile);
+	list = lv_obj_create(appsTile);
 	lv_obj_set_size(list, LV_PCT(100), LV_PCT(100));
 	lv_obj_set_flex_flow(list, LV_FLEX_FLOW_ROW_WRAP);
 	lv_obj_align(list, LV_ALIGN_CENTER, 0, 0);
 
-	createApp(list, "print", "print('abc');");
-	createApp(list, "vibrate", "vibrate();");
+	createApp("print", "print('abc');");
+	createApp("vibrate", "vibrate();");
 }
 
-static void createApp(lv_obj_t *parent, const char *name, const char *source)
+static void createApp(const char *name, const char *source)
 {
-	lv_obj_t *btn = lv_btn_create(parent);
+	lv_obj_t *btn = lv_btn_create(list);
 	lv_obj_set_size(btn, 100, 100);
 	lv_obj_set_style_bg_color(btn, lv_color_hex(0x0000ff), 0);
 
