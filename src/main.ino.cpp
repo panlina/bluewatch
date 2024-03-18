@@ -28,19 +28,6 @@ void setup()
 	setupJs();
 	setupJsServer();
 }
-
-void loop()
-{
-	lv_task_handler();
-	if (lv_disp_get_inactive_time(NULL) >= screenTimeout)
-		enterLightSleep();
-
-	watchfaceHandler();
-	jsServer.handleClient();
-
-	delay(5);
-}
-
 void enterLightSleep()
 {
 	Serial.println("Enter light sleep mode.");
@@ -58,3 +45,16 @@ void enterLightSleep()
 
 	watch.incrementalBrightness(brightness);
 }
+void loop()
+{
+	lv_task_handler();
+	if (lv_disp_get_inactive_time(NULL) >= screenTimeout)
+		enterLightSleep();
+
+	watchfaceHandler();
+	jsServer.handleClient();
+
+	delay(5);
+}
+
+
