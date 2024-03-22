@@ -24,6 +24,8 @@ void setup()
 	configTime(timezone * 3600, 0, ntpServer1, ntpServer2);
 
 	setupWifi();
+	watch.configAccelerometer();
+	watch.enableAccelerometer();
 
 	setupJs();
 	setupJsServer();
