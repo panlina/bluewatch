@@ -9,6 +9,7 @@ const uint32_t screenTimeout = 10000;
 const char *ntpServer1 = "pool.ntp.org";
 const char *ntpServer2 = "time.nist.gov";
 const int timezone = +8;
+bool disableSleep;
 
 void setup()
 {
@@ -34,7 +35,7 @@ void setup()
 void loop()
 {
 	lv_task_handler();
-	if (lv_disp_get_inactive_time(NULL) >= screenTimeout)
+	if (lv_disp_get_inactive_time(NULL) >= screenTimeout && !disableSleep)
 		enterLightSleep();
 
 	watchfaceHandler();
