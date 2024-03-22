@@ -21,6 +21,18 @@ static duk_ret_t js_delay(duk_context *ctx) {
 	return 0;
 }
 
+static duk_ret_t js_getBrightness(duk_context *ctx) {
+	auto brightness = watch.getBrightness();
+	duk_push_uint(ctx, brightness);
+	return 1;
+}
+
+static duk_ret_t js_setBrightness(duk_context *ctx) {
+	auto brightness = duk_get_uint(ctx, 0);
+	watch.setBrightness(brightness);
+	return 0;
+}
+
 void duktape_watch_install(duk_context *ctx) {
 	duk_push_c_function(ctx, js_print, DUK_VARARGS);
 	duk_put_global_string(ctx, "print");
@@ -28,6 +40,10 @@ void duktape_watch_install(duk_context *ctx) {
 	duk_put_global_string(ctx, "vibrate");
 	duk_push_c_function(ctx, js_delay, 1);
 	duk_put_global_string(ctx, "delay");
+	duk_push_c_function(ctx, js_getBrightness, 0);
+	duk_put_global_string(ctx, "getBrightness");
+	duk_push_c_function(ctx, js_setBrightness, 1);
+	duk_put_global_string(ctx, "setBrightness");
 
 	void duktape_watch_install_http(duk_context *ctx);
 	duktape_watch_install_http(ctx);
