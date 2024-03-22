@@ -16,6 +16,9 @@ void setup()
 	watch.begin();
 	beginLvglHelper();
 
+	void registerLvglFontDriver();
+	registerLvglFontDriver();
+
 	setupUi();
 
 	configTime(timezone * 3600, 0, ntpServer1, ntpServer2);
