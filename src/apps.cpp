@@ -70,9 +70,18 @@ void enterApp(const char *source) {
 	enterAppTile();
 	duk_push_pointer(jsContext, appTile);
 	duk_put_global_string(jsContext, "appTile");
-	auto s = "(function(){" + String(source) + "})()";
-	duk_push_string(jsContext, s.c_str());
-	auto rc = duk_peval(jsContext);
+	// WORKAROUND:
+	// It will crash if using:
+	// `String s = "(function(){" + source + "})()";`
+	// And it will also crash if using `duk_peval` directly.
+	// And even with these 2 workarounds it will still crash after dozens of calls.
+	// It's not easy to investigate.
+	String s;
+	s += "(function(){";
+	s += source;
+	s += "})()";
+	duk_compile_string(jsContext, DUK_COMPILE_EVAL, s.c_str());
+	auto rc = duk_pcall(jsContext, 0);
 	if (rc) {
 		duk_safe_to_stacktrace(jsContext, -1);
 		auto stacktrace = duk_get_string(jsContext, -1);

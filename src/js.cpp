@@ -28,8 +28,22 @@ void loadLibraries()
 
 const char *evalJs(const char *code)
 {
-	duk_push_string(jsContext, code);
-	auto rc = duk_peval(jsContext);
+	/*
+		WORKAROUND:
+		It will crash on certain code if using `duk_peval` directly, at least from `jsServer`.
+		A sample code:
+		```
+		(function() {
+		function run() {
+			(function () {
+				var page = 1 + 1;
+			});
+		}
+		})()
+		```
+	*/
+	duk_compile_string(jsContext, DUK_COMPILE_EVAL, code);
+	auto rc = duk_pcall(jsContext, 0);
 
 	if (rc)
 		duk_safe_to_stacktrace(jsContext, -1);
