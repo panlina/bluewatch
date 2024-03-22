@@ -33,6 +33,21 @@ static duk_ret_t js_setBrightness(duk_context *ctx) {
 	return 0;
 }
 
+static duk_ret_t js_getAccelerometer(duk_context *ctx) {
+	int16_t x, y, z;
+	if (watch.getAccelerometer(x, y, z)) {
+		duk_push_object(ctx);
+		duk_push_int(ctx, x);
+		duk_put_prop_string(ctx, -2, "x");
+		duk_push_int(ctx, y);
+		duk_put_prop_string(ctx, -2, "y");
+		duk_push_int(ctx, z);
+		duk_put_prop_string(ctx, -2, "z");
+	} else
+		duk_push_null(ctx);
+	return 1;
+}
+
 void duktape_watch_install(duk_context *ctx) {
 	duk_push_c_function(ctx, js_print, DUK_VARARGS);
 	duk_put_global_string(ctx, "print");
@@ -44,6 +59,8 @@ void duktape_watch_install(duk_context *ctx) {
 	duk_put_global_string(ctx, "getBrightness");
 	duk_push_c_function(ctx, js_setBrightness, 1);
 	duk_put_global_string(ctx, "setBrightness");
+	duk_push_c_function(ctx, js_getAccelerometer, 0);
+	duk_put_global_string(ctx, "getAccelerometer");
 
 	void duktape_watch_install_http(duk_context *ctx);
 	duktape_watch_install_http(ctx);
