@@ -85,6 +85,8 @@ void duktape_watch_install(duk_context *ctx) {
 	duktape_watch_install_http(ctx);
 	void duktape_watch_install_websocket(duk_context *ctx);
 	duktape_watch_install_websocket(ctx);
+	void duktape_watch_install_HttpServer(duk_context *ctx);
+	duktape_watch_install_HttpServer(ctx);
 	void duktape_watch_install_wifi(duk_context *ctx);
 	duktape_watch_install_wifi(ctx);
 	void duktape_watch_install_motor(duk_context *ctx);
