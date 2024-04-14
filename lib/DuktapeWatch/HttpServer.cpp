@@ -69,7 +69,10 @@ static duk_ret_t js_HttpServer_registerUriHandler(duk_context *ctx) {
 		sprintf(stashKey, "httpd_handler_%x", user_ctx);
 		duk_get_prop_string(ctx, -1, stashKey);
 		duk_push_pointer(ctx, req);
-		duk_call(ctx, 1);
+		duk_get_global_string(ctx, "HttpServer.Response");
+		duk_push_pointer(ctx, req);
+		duk_new(ctx, 1);
+		duk_call(ctx, 2);
 		duk_pop_2(ctx);
 		return ESP_OK;
 	});
@@ -107,11 +110,45 @@ void push_HttpServer_prototype(duk_context *ctx) {
 	duk_put_prop_string(ctx, -2, "registerUriHandler");
 }
 
+static duk_ret_t js_Response(duk_context *ctx) {
+	duk_require_constructor_call(ctx);
+	auto req = duk_get_pointer(ctx, 0);
+
+	duk_push_this(ctx);
+	duk_push_pointer(ctx, req);
+	duk_put_prop_string(ctx, -2, "req");
+
+	return 0;
+}
+
+static duk_ret_t js_Response_send(duk_context *ctx) {
+	auto text = duk_get_string(ctx, 0);
+
+	duk_push_this(ctx);
+	duk_get_prop_string(ctx, -1, "req");
+	auto req = (httpd_req_t *)duk_get_pointer(ctx, -1);
+
+	auto err = httpd_resp_send(req, text, HTTPD_RESP_USE_STRLEN);
+	if (err)
+		duk_generic_error(ctx, "http response send error: %d.", err);
+	return 0;
+}
+
+void push_Response_prototype(duk_context *ctx) {
+	duk_push_object(ctx);
+	duk_push_c_function(ctx, js_Response_send, 1);
+	duk_put_prop_string(ctx, -2, "send");
+}
+
 void duktape_watch_install_HttpServer(duk_context *ctx) {
 	duk_push_c_function(ctx, js_HttpServer, 1);
 	push_HttpServer_prototype(ctx);
 	duk_put_prop_string(ctx, -2, "prototype");
 	duk_put_global_string(ctx, "HttpServer");
+	duk_push_c_function(ctx, js_Response, 1);
+	push_Response_prototype(ctx);
+	duk_put_prop_string(ctx, -2, "prototype");
+	duk_put_global_string(ctx, "HttpServer.Response");
 	duk_push_uint(ctx, HTTP_DELETE);
 	duk_put_global_string(ctx, "HTTP_DELETE");
 	duk_push_uint(ctx, HTTP_GET);
