@@ -19,7 +19,7 @@ static void createApp(const char *name);
 
 static void loadApps()
 {
-    auto dir = SPIFFS.open("/app");
+	auto dir = SPIFFS.open("/app");
 	while (auto file = dir.openNextFile()) {
 		String name = file.name();
 		createApp(name.substring(0, name.length() - 3).c_str());	// remove ".js"

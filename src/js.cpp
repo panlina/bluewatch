@@ -17,7 +17,7 @@ void setupJs()
 
 void loadLibraries()
 {
-    auto dir = SPIFFS.open("/library");
+	auto dir = SPIFFS.open("/library");
 	while (auto file = dir.openNextFile()) {
 		auto source = file.readString();
 		duk_push_string(jsContext, source.c_str());
