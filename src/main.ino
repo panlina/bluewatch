@@ -11,6 +11,8 @@ const char *ntpServer2 = "time.nist.gov";
 const int timezone = +8;
 bool disableSleep;
 
+SET_LOOP_TASK_STACK_SIZE(16 * 1024);	// Duktape compile may use up default (8K) stack space
+
 void setup()
 {
 	Serial.begin(115200);
