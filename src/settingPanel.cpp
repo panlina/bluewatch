@@ -1,5 +1,6 @@
 #include <LilyGoLib.h>
 #include <WiFi.h>
+#include "event.h"
 
 lv_obj_t *settingPanel;
 static lv_coord_t touchY0;
@@ -9,6 +10,7 @@ static bool isDragging;
 static const lv_coord_t stickOut = 10;
 
 extern String wifiSsid;
+extern String wifiPassword;
 
 void setupSettingPanel() {
 	settingPanel = lv_obj_create(lv_scr_act());
@@ -88,6 +90,21 @@ void setupSettingPanel() {
 				break;
 		}
 	});
+
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_WIFI_CONNECTING, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		auto wifiLabel = (lv_obj_t *)event_handler_arg;
+		lv_label_set_text_fmt(wifiLabel, LV_SYMBOL_WIFI " Connecting...");
+	}, wifiLabel);
+
+	lv_obj_add_event_cb(wifiBtn, [](lv_event_t *e) {
+		auto wifiBtn = lv_event_get_target(e);
+		if (WiFi.isConnected())
+			WiFi.disconnect();
+		else {
+			WiFi.begin(wifiSsid, wifiPassword);
+			esp_event_post(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_WIFI_CONNECTING, nullptr, 0, 0);
+		}
+	}, LV_EVENT_CLICKED, nullptr);
 
 	auto batteryBtn = lv_btn_create(settingPanel);
 	lv_obj_set_width(batteryBtn, LV_PCT(100));

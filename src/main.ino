@@ -18,6 +18,7 @@ void setup()
 	Serial.begin(115200);
 	watch.begin();
 	beginLvglHelper();
+	esp_event_loop_create_default();
 
 	void registerLvglFontDriver();
 	registerLvglFontDriver();
