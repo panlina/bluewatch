@@ -1,6 +1,7 @@
 #include <LilyGoLib.h>
 #include <WiFi.h>
 #include "event.h"
+#include "setting.h"
 
 lv_obj_t *settingPanel;
 static lv_coord_t touchY0;
@@ -98,9 +99,11 @@ void setupSettingPanel() {
 
 	lv_obj_add_event_cb(wifiBtn, [](lv_event_t *e) {
 		auto wifiBtn = lv_event_get_target(e);
-		if (WiFi.isConnected())
+		if (WiFi.isConnected()) {
+			setting.set(".wifi", Value(false));
 			WiFi.disconnect();
-		else {
+		} else {
+			setting.set(".wifi", Value(true));
 			WiFi.begin(wifiSsid, wifiPassword);
 			esp_event_post(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_WIFI_CONNECTING, nullptr, 0, 0);
 		}
