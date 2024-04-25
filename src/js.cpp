@@ -20,16 +20,13 @@ void loadLibraries()
 	auto dir = SPIFFS.open("/library");
 	while (auto file = dir.openNextFile()) {
 		auto source = file.readString();
-		duk_push_string(jsContext, source.c_str());
-		auto rc = duk_peval(jsContext);
-		duk_pop(jsContext);
+		auto rc = duk_peval_string_noresult(jsContext, source.c_str());
 	}
 }
 
 const char *evalJs(const char *code)
 {
-	duk_push_string(jsContext, code);
-	auto rc = duk_peval(jsContext);
+	auto rc = duk_peval_string(jsContext, code);
 
 	if (rc)
 		duk_safe_to_stacktrace(jsContext, -1);

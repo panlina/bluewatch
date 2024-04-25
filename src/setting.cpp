@@ -9,8 +9,7 @@ Value Setting::get(const char *path) {
 	auto file = SPIFFS.open(this->file);
 	auto content = file.readString();
 	file.close();
-	duk_push_string(ctx, ("(" + content + path + ")").c_str());
-	duk_eval(ctx);
+	duk_eval_string(ctx, ("(" + content + path + ")").c_str());
 	Value value = pop(ctx);
 	duk_destroy_heap(ctx);
 	return value;
@@ -26,8 +25,7 @@ void Setting::set(const char *path, Value value) {
 	duk_put_global_string(ctx, "a");
 	push(ctx, value);
 	duk_put_global_string(ctx, "b");
-	duk_push_string(ctx, ("a" + String(path) + "=b,a").c_str());
-	duk_eval(ctx);
+	duk_eval_string(ctx, ("a" + String(path) + "=b,a").c_str());
 	duk_json_encode(ctx, -1);
 	content = (String)pop(ctx).value.string;
 	file = SPIFFS.open(this->file, "w");

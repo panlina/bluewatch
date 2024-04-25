@@ -71,8 +71,7 @@ void enterApp(const char *source) {
 	duk_push_pointer(jsContext, appTile);
 	duk_put_global_string(jsContext, "appTile");
 	auto s = "(function(){" + String(source) + "})()";
-	duk_push_string(jsContext, s.c_str());
-	auto rc = duk_peval(jsContext);
+	auto rc = duk_peval_string(jsContext, s.c_str());
 	if (rc) {
 		duk_safe_to_stacktrace(jsContext, -1);
 		auto stacktrace = duk_get_string(jsContext, -1);
