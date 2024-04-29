@@ -12,6 +12,7 @@ static const lv_coord_t stickOut = 10;
 
 extern String wifiSsid;
 extern String wifiPassword;
+extern bool wifiConnecting;
 
 void setupSettingPanel() {
 	settingPanel = lv_obj_create(lv_scr_act());
@@ -98,6 +99,7 @@ void setupSettingPanel() {
 	}, wifiLabel);
 
 	lv_obj_add_event_cb(wifiBtn, [](lv_event_t *e) {
+		if (wifiConnecting) return;
 		auto wifiBtn = lv_event_get_target(e);
 		if (WiFi.isConnected()) {
 			setting.set(".wifi", Value(false));
