@@ -1,21 +1,22 @@
 #include <SPIFFS.h>
 #include <duktape.h>
 #include "setting.h"
+#include "json.h"
 
 Setting::Setting(const char *file) : file(file) {}
 
-Value Setting::get(const char *path) {
+Json Setting::get(const char *path) {
 	auto ctx = duk_create_heap_default();
 	auto file = SPIFFS.open(this->file);
 	auto content = file.readString();
 	file.close();
 	duk_eval_string(ctx, ("(" + content + path + ")").c_str());
-	Value value = pop(ctx);
+	Json value = pop(ctx);
 	duk_destroy_heap(ctx);
 	return value;
 }
 
-void Setting::set(const char *path, Value value) {
+void Setting::set(const char *path, Json value) {
 	auto ctx = duk_create_heap_default();
 	auto file = SPIFFS.open(this->file);
 	auto content = file.readString();
@@ -34,8 +35,8 @@ void Setting::set(const char *path, Value value) {
 	duk_destroy_heap(ctx);
 }
 
-Value Setting::pop(duk_context *ctx) {
-	Value value;
+Json Setting::pop(duk_context *ctx) {
+	Json value;
 	value.type = duk_get_type(ctx, -1);
 	switch (value.type)
 	{
@@ -53,7 +54,7 @@ Value Setting::pop(duk_context *ctx) {
 	return value;
 }
 
-void Setting::push(duk_context *ctx, Value value) {
+void Setting::push(duk_context *ctx, Json value) {
 	switch (value.type)
 	{
 	case DUK_TYPE_UNDEFINED:
@@ -77,11 +78,3 @@ void Setting::push(duk_context *ctx, Value value) {
 }
 
 Setting setting("/setting.json");
-
-Value::Value() {}
-Value::Value(bool value) : type(DUK_TYPE_BOOLEAN), value({boolean : value}) {}
-Value::Value(double value) : type(DUK_TYPE_NUMBER), value({number : value}) {}
-Value::Value(const char *value) : type(DUK_TYPE_STRING), value({string : value}) {}
-Value::operator bool() const { return value.boolean; }
-Value::operator double() const { return value.number; }
-Value::operator const char *() const { return value.string; }

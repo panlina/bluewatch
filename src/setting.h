@@ -1,32 +1,15 @@
 #include <duktape.h>
-
-struct Value;
+#include "json.h"
 
 class Setting
 {
 	const char *file;
-	Value pop(duk_context *ctx);
-	void push(duk_context *ctx, Value value);
+	Json pop(duk_context *ctx);
+	void push(duk_context *ctx, Json value);
 public:
 	Setting(const char *file);
-	Value get(const char *path);
-	void set(const char *path, Value value);
+	Json get(const char *path);
+	void set(const char *path, Json value);
 };
 
 extern Setting setting;
-
-struct Value {
-	int type;
-	union {
-		bool boolean;
-		double number;
-		const char *string;
-	} value;
-	Value();
-	Value(bool);
-	Value(double);
-	Value(const char *);
-	explicit operator bool() const;
-	explicit operator double() const;
-	explicit operator const char *() const;
-};

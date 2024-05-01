@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include "event.h"
 #include "setting.h"
+#include "json.h"
 
 lv_obj_t *settingPanel;
 static lv_coord_t touchY0;
@@ -102,10 +103,10 @@ void setupSettingPanel() {
 		if (wifiConnecting) return;
 		auto wifiBtn = lv_event_get_target(e);
 		if (WiFi.isConnected()) {
-			setting.set(".wifi", Value(false));
+			setting.set(".wifi", Json(false));
 			WiFi.disconnect();
 		} else {
-			setting.set(".wifi", Value(true));
+			setting.set(".wifi", Json(true));
 			WiFi.begin(wifiSsid, wifiPassword);
 			esp_event_post(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_WIFI_CONNECTING, nullptr, 0, 0);
 		}
