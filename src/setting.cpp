@@ -37,16 +37,19 @@ void Setting::set(const char *path, Json value) {
 
 Json Setting::pop(duk_context *ctx) {
 	Json value;
-	value.type = duk_get_type(ctx, -1);
-	switch (value.type)
+	auto type = duk_get_type(ctx, -1);
+	switch (type)
 	{
 	case DUK_TYPE_BOOLEAN:
+		value.type = Json::Type::boolean;
 		value.value.boolean = duk_get_boolean(ctx, -1);
 		break;
 	case DUK_TYPE_NUMBER:
+		value.type = Json::Type::number;
 		value.value.number = duk_get_number(ctx, -1);
 		break;
 	case DUK_TYPE_STRING:
+		value.type = Json::Type::string;
 		value.value.string = duk_get_string(ctx, -1);
 		break;
 	}
@@ -57,19 +60,19 @@ Json Setting::pop(duk_context *ctx) {
 void Setting::push(duk_context *ctx, Json value) {
 	switch (value.type)
 	{
-	case DUK_TYPE_UNDEFINED:
+	case Json::Type::undefined:
 		duk_push_undefined(ctx);
 		break;
-	case DUK_TYPE_NULL:
+	case Json::Type::null:
 		duk_push_null(ctx);
 		break;
-	case DUK_TYPE_BOOLEAN:
+	case Json::Type::boolean:
 		duk_push_boolean(ctx, value.value.boolean);
 		break;
-	case DUK_TYPE_NUMBER:
+	case Json::Type::number:
 		duk_push_number(ctx, value.value.number);
 		break;
-	case DUK_TYPE_STRING:
+	case Json::Type::string:
 		duk_push_string(ctx, value.value.string);
 		break;
 	default:

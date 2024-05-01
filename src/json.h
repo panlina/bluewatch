@@ -1,7 +1,16 @@
 #pragma once
 
 struct Json {
-	int type;
+	enum Type {
+		undefined,
+		null,
+		boolean,
+		number,
+		string,
+		array,
+		object
+	};
+	Type type;
 	union {
 		bool boolean;
 		double number;
