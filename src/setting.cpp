@@ -28,7 +28,7 @@ void Setting::set(const char *path, Json value) {
 	duk_put_global_string(ctx, "b");
 	duk_eval_string(ctx, ("a" + String(path) + "=b,a").c_str());
 	duk_json_encode(ctx, -1);
-	content = (String)pop(ctx).value.string;
+	content = (const char *)pop(ctx);
 	file = SPIFFS.open(this->file, "w");
 	file.write((const uint8_t *)content.c_str(), content.length());
 	file.close();
