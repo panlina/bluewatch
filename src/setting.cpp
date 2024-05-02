@@ -28,7 +28,7 @@ void Setting::set(const char *path, Json value) {
 	duk_put_global_string(ctx, "b");
 	duk_eval_string(ctx, ("a" + String(path) + "=b,a").c_str());
 	duk_json_encode(ctx, -1);
-	content = (const char *)pop(ctx);
+	content = (String)pop(ctx);
 	file = SPIFFS.open(this->file, "w");
 	file.write((const uint8_t *)content.c_str(), content.length());
 	file.close();
@@ -50,7 +50,7 @@ Json Setting::pop(duk_context *ctx) {
 		break;
 	case DUK_TYPE_STRING:
 		value.type = Json::Type::string;
-		value.value.string = duk_get_string(ctx, -1);
+		value.value.string = new String(duk_get_string(ctx, -1));
 		break;
 	}
 	duk_pop(ctx);
@@ -73,7 +73,7 @@ void Setting::push(duk_context *ctx, Json value) {
 		duk_push_number(ctx, value.value.number);
 		break;
 	case Json::Type::string:
-		duk_push_string(ctx, value.value.string);
+		duk_push_string(ctx, value.value.string->c_str());
 		break;
 	default:
 		break;

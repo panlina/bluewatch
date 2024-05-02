@@ -1,3 +1,4 @@
+#include <WString.h>
 #include <vector>
 #include <map>
 #include <initializer_list>
@@ -13,7 +14,7 @@ using std::size_t;
 Json::Json() {}
 Json::Json(bool value) : type(Json::Type::boolean), value({boolean : value}) {}
 Json::Json(double value) : type(Json::Type::number), value({number : value}) {}
-Json::Json(const char *value) : type(Json::Type::string), value({string : value}) {}
+Json::Json(const String &value) : type(Json::Type::string), value({string : new String(value)}) {}
 Json::Json(initializer_list<Json> value) : type(Json::Type::array), value({array : new vector<Json>(value)}) {}
 Json::Json(initializer_list<pair<const char *const, Json>> value) : type(Json::Type::object), value({object : new map<const char *, Json>(value)}) {}
 Json::Json(const Json &that) {
@@ -21,13 +22,14 @@ Json::Json(const Json &that) {
 	switch (type) {
 	case Type::boolean: value.boolean = that.value.boolean; break;
 	case Type::number: value.number = that.value.number; break;
-	case Type::string: value.string = that.value.string; break;
+	case Type::string: value.string = new String(*that.value.string); break;
 	case Type::array: value.array = new vector<Json>(*that.value.array); break;
 	case Type::object: value.object = new map<const char *, Json>(*that.value.object); break;
 	}
 }
 Json &Json::operator=(const Json &that) {
 	switch (type) {
+	case Type::string: delete value.string; break;
 	case Type::array: delete value.array; break;
 	case Type::object: delete value.object; break;
 	}
@@ -35,7 +37,7 @@ Json &Json::operator=(const Json &that) {
 	switch (type) {
 	case Type::boolean: value.boolean = that.value.boolean; break;
 	case Type::number: value.number = that.value.number; break;
-	case Type::string: value.string = that.value.string; break;
+	case Type::string: value.string = new String(*that.value.string); break;
 	case Type::array: value.array = new vector<Json>(*that.value.array); break;
 	case Type::object: value.object = new map<const char *, Json>(*that.value.object); break;
 	}
@@ -43,13 +45,14 @@ Json &Json::operator=(const Json &that) {
 }
 Json::~Json() {
 	switch (type) {
+	case Type::string: delete value.string; break;
 	case Type::array: delete value.array; break;
 	case Type::object: delete value.object; break;
 	}
 }
 Json::operator bool() const { return value.boolean; }
 Json::operator double() const { return value.number; }
-Json::operator const char *() const { return value.string; }
+Json::operator String() const { return *value.string; }
 Json &Json::operator[](int index) { return (*value.array)[index]; }
 size_t Json::length() const { return value.array->size(); }
 void Json::push(const Json &element) { value.array->push_back(element); }

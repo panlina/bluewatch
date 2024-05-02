@@ -1,5 +1,6 @@
 #pragma once
 
+#include <WString.h>
 #include <vector>
 #include <map>
 #include <initializer_list>
@@ -19,14 +20,14 @@ struct Json {
 	union {
 		bool boolean;
 		double number;
-		const char *string;
+		String *string;
 		std::vector<Json> *array;
 		std::map<const char *, Json> *object;
 	} value;
 	Json();
 	Json(bool);
 	Json(double);
-	Json(const char *);
+	Json(const String &);
 	Json(std::initializer_list<Json>);
 	Json(std::initializer_list<std::pair<const char *const, Json>>);
 	Json(const Json &);
@@ -34,7 +35,7 @@ struct Json {
 	~Json();
 	explicit operator bool() const;
 	explicit operator double() const;
-	explicit operator const char *() const;
+	explicit operator String() const;
 	Json &operator[](int);
 	std::size_t length() const;
 	void push(const Json &);
