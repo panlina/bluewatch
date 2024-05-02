@@ -52,6 +52,31 @@ Json Setting::pop(duk_context *ctx) {
 		value.type = Json::Type::string;
 		value.value.string = new String(duk_get_string(ctx, -1));
 		break;
+	case DUK_TYPE_OBJECT:
+		if (duk_is_array(ctx, -1)) {
+			// value is uninitialized, so initialize to undefined before assignment,
+			// to make sure that the assignment works correctly.
+			// Json default ctor will be removed later.
+			value.type = Json::Type::undefined;
+			value = Json((std::initializer_list<Json>){});
+			auto length = duk_get_length(ctx, -1);
+			for (auto i = 0; i < length; i++) {
+				duk_get_prop_index(ctx, -1, i);
+				value.push(pop(ctx));
+			}
+		} else {
+			value.type = Json::Type::undefined;
+			value = Json((std::initializer_list<std::pair<const String, Json>>){});
+			duk_enum(ctx, -1, DUK_ENUM_OWN_PROPERTIES_ONLY);
+			while (duk_next(ctx, -1, 1)) {
+				auto _value = pop(ctx);
+				auto key = duk_get_string(ctx, -1);
+				value[key] = _value;
+				duk_pop(ctx);
+			}
+			duk_pop(ctx);
+		}
+		break;
 	}
 	duk_pop(ctx);
 	return value;
@@ -74,6 +99,22 @@ void Setting::push(duk_context *ctx, Json value) {
 		break;
 	case Json::Type::string:
 		duk_push_string(ctx, value.value.string->c_str());
+		break;
+	case Json::Type::array: {
+		duk_push_array(ctx);
+		auto length = value.length();
+		for (auto i = 0; i < length; i++) {
+			push(ctx, value[i]);
+			duk_put_prop_index(ctx, -2, i);
+		}
+		break;
+	}
+	case Json::Type::object:
+		duk_push_object(ctx);
+		for (auto i = value.value.object->begin(); i != value.value.object->end(); i++) {
+			push(ctx, i->second);
+			duk_put_prop_string(ctx, -2, i->first.c_str());
+		}
 		break;
 	default:
 		break;
