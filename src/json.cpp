@@ -16,7 +16,7 @@ Json::Json(bool value) : type(Json::Type::boolean), value({boolean : value}) {}
 Json::Json(double value) : type(Json::Type::number), value({number : value}) {}
 Json::Json(const String &value) : type(Json::Type::string), value({string : new String(value)}) {}
 Json::Json(initializer_list<Json> value) : type(Json::Type::array), value({array : new vector<Json>(value)}) {}
-Json::Json(initializer_list<pair<const char *const, Json>> value) : type(Json::Type::object), value({object : new map<const char *, Json>(value)}) {}
+Json::Json(initializer_list<pair<const String, Json>> value) : type(Json::Type::object), value({object : new map<String, Json>(value)}) {}
 Json::Json(const Json &that) {
 	type = that.type;
 	switch (type) {
@@ -24,7 +24,7 @@ Json::Json(const Json &that) {
 	case Type::number: value.number = that.value.number; break;
 	case Type::string: value.string = new String(*that.value.string); break;
 	case Type::array: value.array = new vector<Json>(*that.value.array); break;
-	case Type::object: value.object = new map<const char *, Json>(*that.value.object); break;
+	case Type::object: value.object = new map<String, Json>(*that.value.object); break;
 	}
 }
 Json &Json::operator=(const Json &that) {
@@ -39,7 +39,7 @@ Json &Json::operator=(const Json &that) {
 	case Type::number: value.number = that.value.number; break;
 	case Type::string: value.string = new String(*that.value.string); break;
 	case Type::array: value.array = new vector<Json>(*that.value.array); break;
-	case Type::object: value.object = new map<const char *, Json>(*that.value.object); break;
+	case Type::object: value.object = new map<String, Json>(*that.value.object); break;
 	}
 	return *this;
 }
@@ -56,4 +56,4 @@ Json::operator String() const { return *value.string; }
 Json &Json::operator[](int index) { return (*value.array)[index]; }
 size_t Json::length() const { return value.array->size(); }
 void Json::push(const Json &element) { value.array->push_back(element); }
-Json &Json::operator[](const char *key) { return (*value.object)[key]; }
+Json &Json::operator[](const String &key) { return (*value.object)[key]; }

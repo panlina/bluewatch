@@ -22,14 +22,14 @@ struct Json {
 		double number;
 		String *string;
 		std::vector<Json> *array;
-		std::map<const char *, Json> *object;
+		std::map<String, Json> *object;
 	} value;
 	Json();
 	Json(bool);
 	Json(double);
 	Json(const String &);
 	Json(std::initializer_list<Json>);
-	Json(std::initializer_list<std::pair<const char *const, Json>>);
+	Json(std::initializer_list<std::pair<const String, Json>>);
 	Json(const Json &);
 	Json &operator=(const Json &);
 	~Json();
@@ -39,5 +39,5 @@ struct Json {
 	Json &operator[](int);
 	std::size_t length() const;
 	void push(const Json &);
-	Json &operator[](const char *);
+	Json &operator[](const String &);
 };
