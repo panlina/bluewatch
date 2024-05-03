@@ -3,6 +3,7 @@
 #include "event.h"
 #include "setting.h"
 #include "json.h"
+#include "wifi_.h"
 
 lv_obj_t *settingPanel;
 static lv_coord_t touchY0;
@@ -10,10 +11,6 @@ static lv_coord_t panelY0;
 static bool isDragging;
 
 static const lv_coord_t stickOut = 10;
-
-extern String wifiSsid;
-extern String wifiPassword;
-extern bool wifiConnecting;
 
 void setupSettingPanel() {
 	settingPanel = lv_obj_create(lv_scr_act());
@@ -84,7 +81,7 @@ void setupSettingPanel() {
 			case ARDUINO_EVENT_WIFI_STA_GOT_IP6:
 			case ARDUINO_EVENT_WIFI_STA_LOST_IP:
 				if (WiFi.isConnected()) {
-					lv_label_set_text_fmt(wifiLabel, "%s %s", LV_SYMBOL_WIFI, wifiSsid.c_str());
+					lv_label_set_text_fmt(wifiLabel, "%s %s", LV_SYMBOL_WIFI, wifiSetting.network.c_str());
 					lv_obj_add_state(wifiBtn, LV_STATE_CHECKED);
 				} else {
 					lv_label_set_text(wifiLabel, LV_SYMBOL_WIFI " Not Connected");
@@ -103,11 +100,12 @@ void setupSettingPanel() {
 		if (wifiConnecting) return;
 		auto wifiBtn = lv_event_get_target(e);
 		if (WiFi.isConnected()) {
-			setting.set(".wifi", Json(false));
+			setting.set(".wifi.enabled", Json(false));
 			WiFi.disconnect();
 		} else {
-			setting.set(".wifi", Json(true));
-			WiFi.begin(wifiSsid, wifiPassword);
+			setting.set(".wifi.enabled", Json(true));
+			auto network = std::find_if(wifiNetwork.begin(), wifiNetwork.end(), [](const WifiNetwork &network) { return network.ssid == wifiSetting.network; });
+			WiFi.begin(network->ssid, network->password);
 			esp_event_post(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_WIFI_CONNECTING, nullptr, 0, 0);
 		}
 	}, LV_EVENT_CLICKED, nullptr);

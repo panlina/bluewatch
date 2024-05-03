@@ -3,9 +3,13 @@
 #include <SPIFFS.h>
 #include "event.h"
 #include "setting.h"
+#include "wifi_.h"
+#include <vector>
 
-String wifiSsid;
-String wifiPassword;
+using std::vector;
+
+vector<WifiNetwork> wifiNetwork;
+WifiSetting wifiSetting;
 
 bool wifiConnecting;
 
@@ -32,15 +36,25 @@ void setupWifi()
 {
 	registerEventHandlers();
 
-	auto file = SPIFFS.open("/wifi.txt");
-	if (file) {
-		wifiSsid = file.readStringUntil('\n');
-		wifiPassword = file.readStringUntil('\n');
-		file.close();
-		auto wifiEnabled = (bool)setting.get(".wifi");
-		if (wifiEnabled) {
-			WiFi.begin(wifiSsid, wifiPassword);
-			esp_event_post(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_WIFI_CONNECTING, nullptr, 0, 0);
+	if (SPIFFS.exists("/wifi-network.json")) {
+		auto network = wifiNetworkSetting.get("");
+		for (auto i = 0; i < network.length(); i++) {
+			auto n = network[i];
+			wifiNetwork.push_back(
+				WifiNetwork{
+					.ssid = (String)n["ssid"],
+					.password = (String)n["password"]
+				}
+			);
 		}
+	}
+
+	auto wifi = setting.get(".wifi");
+	wifiSetting.network = (String)wifi["network"];
+	wifiSetting.enabled = (bool)wifi["enabled"];
+	if (wifiSetting.enabled) {
+		auto network = std::find_if(wifiNetwork.begin(), wifiNetwork.end(), [=](const WifiNetwork &network) { return network.ssid == wifiSetting.network; });
+		WiFi.begin(network->ssid, network->password);
+		esp_event_post(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_WIFI_CONNECTING, nullptr, 0, 0);
 	}
 }

@@ -13,3 +13,4 @@ public:
 };
 
 extern Setting setting;
+extern Setting wifiNetworkSetting;

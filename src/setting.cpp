@@ -114,3 +114,4 @@ void Setting::push(duk_context *ctx, Json value) {
 }
 
 Setting setting("/setting.json");
+Setting wifiNetworkSetting("/wifi-network.json");
