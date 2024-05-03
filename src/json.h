@@ -8,7 +8,6 @@
 
 struct Json {
 	enum Type {
-		undefined,
 		null,
 		boolean,
 		number,

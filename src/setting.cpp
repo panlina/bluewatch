@@ -54,10 +54,10 @@ Json Setting::pop(duk_context *ctx) {
 		break;
 	case DUK_TYPE_OBJECT:
 		if (duk_is_array(ctx, -1)) {
-			// value is uninitialized, so initialize to undefined before assignment,
+			// value is uninitialized, so initialize to null before assignment,
 			// to make sure that the assignment works correctly.
 			// Json default ctor will be removed later.
-			value.type = Json::Type::undefined;
+			value.type = Json::Type::null;
 			value = Json((std::initializer_list<Json>){});
 			auto length = duk_get_length(ctx, -1);
 			for (auto i = 0; i < length; i++) {
@@ -65,7 +65,7 @@ Json Setting::pop(duk_context *ctx) {
 				value.push(pop(ctx));
 			}
 		} else {
-			value.type = Json::Type::undefined;
+			value.type = Json::Type::null;
 			value = Json((std::initializer_list<std::pair<const String, Json>>){});
 			duk_enum(ctx, -1, DUK_ENUM_OWN_PROPERTIES_ONLY);
 			while (duk_next(ctx, -1, 1)) {
@@ -85,9 +85,6 @@ Json Setting::pop(duk_context *ctx) {
 void Setting::push(duk_context *ctx, Json value) {
 	switch (value.type)
 	{
-	case Json::Type::undefined:
-		duk_push_undefined(ctx);
-		break;
 	case Json::Type::null:
 		duk_push_null(ctx);
 		break;
