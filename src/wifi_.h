@@ -6,4 +6,5 @@ This file name has a `_` suffix. It is used to avoid conflict with `<WiFi.h>`
 
 extern String wifiSsid;
 extern String wifiPassword;
+extern bool wifiConnecting;
 void setupWifi();
