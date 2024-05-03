@@ -7,7 +7,7 @@
 #include <utility>
 
 struct Json {
-	enum Type {
+	enum struct Type {
 		null,
 		boolean,
 		number,
