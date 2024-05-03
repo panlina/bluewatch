@@ -23,6 +23,7 @@ struct Json {
 		std::vector<Json> *array;
 		std::map<String, Json> *object;
 	} value;
+	static Json null;
 	Json();
 	Json(bool);
 	Json(double);

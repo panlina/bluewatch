@@ -11,7 +11,8 @@ using std::initializer_list;
 using std::pair;
 using std::size_t;
 
-Json::Json() {}
+Json Json::null = Json();
+Json::Json() : type(Json::Type::null) {}
 Json::Json(bool value) : type(Json::Type::boolean), value({boolean : value}) {}
 Json::Json(double value) : type(Json::Type::number), value({number : value}) {}
 Json::Json(const String &value) : type(Json::Type::string), value({string : new String(value)}) {}
