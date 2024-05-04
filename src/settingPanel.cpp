@@ -4,6 +4,11 @@
 #include "setting.h"
 #include "json.h"
 #include "wifi_.h"
+#include "Modal.h"
+#include <tuple>
+#include <utility>
+
+using std::tuple;
 
 lv_obj_t *settingPanel;
 static lv_coord_t touchY0;
@@ -72,6 +77,11 @@ void setupSettingPanel() {
 	lv_obj_set_style_bg_opa(wifiBtn, LV_OPA_100, LV_PART_MAIN | LV_STATE_CHECKED);
 	auto wifiLabel = lv_label_create(wifiBtn);
 	lv_label_set_text(wifiLabel, LV_SYMBOL_WIFI " Not Connected");
+	auto arrowLabel = lv_label_create(wifiBtn);
+	lv_label_set_text(arrowLabel, LV_SYMBOL_DOWN);
+	lv_obj_set_align(arrowLabel, LV_ALIGN_RIGHT_MID);
+	lv_obj_add_flag(arrowLabel, LV_OBJ_FLAG_CLICKABLE);
+	lv_obj_set_ext_click_area(arrowLabel, 6);
 
 	WiFi.onEvent([=](arduino_event_id_t id, arduino_event_info_t info) {
 		switch (id) {
@@ -100,13 +110,53 @@ void setupSettingPanel() {
 		if (wifiConnecting) return;
 		auto wifiBtn = lv_event_get_target(e);
 		if (WiFi.isConnected()) {
+			wifiSetting.enabled = false;
 			setting.set(".wifi.enabled", Json(false));
 			WiFi.disconnect();
 		} else {
+			wifiSetting.enabled = true;
 			setting.set(".wifi.enabled", Json(true));
 			auto network = std::find_if(wifiNetwork.begin(), wifiNetwork.end(), [](const WifiNetwork &network) { return network.ssid == wifiSetting.network; });
 			WiFi.begin(network->ssid, network->password);
 			esp_event_post(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_WIFI_CONNECTING, nullptr, 0, 0);
+		}
+	}, LV_EVENT_CLICKED, nullptr);
+
+	lv_obj_add_event_cb(arrowLabel, [](lv_event_t *e) {
+		Modal modal(true);
+		lv_obj_set_size(modal.obj, 200, 180);
+		auto list = lv_list_create(modal.obj);
+		lv_obj_set_size(list, LV_PCT(100), LV_PCT(100));
+		for (auto network : wifiNetwork) {
+			auto btn = lv_list_add_btn(list, LV_SYMBOL_WIFI, network.ssid.c_str());
+			if (wifiSetting.enabled && network.ssid == wifiSetting.network) {
+				auto colorPrimary = lv_theme_get_color_primary(btn);
+				lv_obj_set_style_bg_color(btn, colorPrimary, LV_STATE_CHECKED);
+				lv_obj_set_style_text_color(btn, lv_color_white(), LV_STATE_CHECKED);
+				lv_obj_set_style_transform_width(btn, 20, LV_STATE_CHECKED);
+				lv_obj_add_state(btn, LV_STATE_CHECKED);
+			}
+			auto user_data = new tuple<WifiNetwork, Modal>(network, modal);
+			lv_obj_add_event_cb(btn, [](lv_event_t *e) {
+				auto user_data = (tuple<WifiNetwork, Modal> *)lv_event_get_user_data(e);
+				auto network = std::get<0>(*user_data);
+				auto modal = std::get<1>(*user_data);
+				if (network.ssid == wifiSetting.network) return;
+				wifiSetting.network = network.ssid;
+				wifiSetting.enabled = true;
+				setting.set(".wifi", Json{
+					std::make_pair("network", wifiSetting.network),
+					std::make_pair("enabled", wifiSetting.enabled)
+				});
+				WiFi.disconnect();
+				WiFi.begin(network.ssid, network.password);
+				esp_event_post(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_WIFI_CONNECTING, nullptr, 0, 0);
+				modal.close();
+			}, LV_EVENT_CLICKED, user_data);
+			lv_obj_add_event_cb(btn, [](lv_event_t *e) {
+				auto user_data = (tuple<WifiNetwork, Modal> *)lv_event_get_user_data(e);
+				delete user_data;
+			}, LV_EVENT_DELETE, user_data);
 		}
 	}, LV_EVENT_CLICKED, nullptr);
 
