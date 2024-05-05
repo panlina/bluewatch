@@ -38,8 +38,9 @@ void setup()
 void loop()
 {
 	lv_task_handler();
-	if (lv_disp_get_inactive_time(NULL) >= screenTimeout && !disableSleep)
-		enterLightSleep();
+	if (!disableSleep)
+		if (lv_disp_get_inactive_time(NULL) >= screenTimeout)
+			enterLightSleep();
 
 	watchfaceHandler();
 	jsServer.handleClient();
