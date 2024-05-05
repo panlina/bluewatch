@@ -4,6 +4,8 @@
 #include "wifi_.h"
 #include "js.h"
 #include "jsServer.h"
+#include "event.h"
+#include "setting.h"
 
 const uint32_t screenTimeout = 10000;
 const char *ntpServer1 = "pool.ntp.org";
@@ -15,6 +17,8 @@ void setDisableSleep(bool value) {
 	disableSleep = value;
 	if (!value)
 		lv_disp_trig_activity(NULL);
+	esp_event_post(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_DISABLE_SLEEP_CHANGE, nullptr, 0, 0);
+	setting.set(".disableSleep", Json(disableSleep));
 }
 
 SET_LOOP_TASK_STACK_SIZE(16 * 1024);	// Duktape compile may use up default (8K) stack space
@@ -30,6 +34,7 @@ void setup()
 	registerLvglFontDriver();
 
 	setupUi();
+	setDisableSleep((bool)setting.get(".disableSleep"));
 
 	configTime(timezone * 3600, 0, ntpServer1, ntpServer2);
 

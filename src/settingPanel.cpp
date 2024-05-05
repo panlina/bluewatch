@@ -167,4 +167,25 @@ void setupSettingPanel() {
 	auto batteryLabel = lv_label_create(batteryBtn);
 	lv_label_set_text_fmt(batteryLabel, "%s %d%%", LV_SYMBOL_BATTERY_FULL, watch.getBatteryPercent());
 	// TODO: update battery periodically
+
+	auto disableSleepBtn = lv_btn_create(settingPanel);
+	lv_obj_set_width(disableSleepBtn, LV_PCT(100));
+	lv_obj_set_style_bg_color(disableSleepBtn, lv_color_white(), LV_PART_MAIN);
+	lv_obj_set_style_bg_opa(disableSleepBtn, LV_OPA_20, LV_PART_MAIN);
+	lv_obj_set_style_bg_color(disableSleepBtn, colorPrimary, LV_PART_MAIN | LV_STATE_CHECKED);
+	lv_obj_set_style_bg_opa(disableSleepBtn, LV_OPA_100, LV_PART_MAIN | LV_STATE_CHECKED);
+	auto disableSleepLabel = lv_label_create(disableSleepBtn);
+	lv_label_set_text(disableSleepLabel, "Disable Sleep");
+
+	extern bool disableSleep;
+	void setDisableSleep(bool value);
+
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_DISABLE_SLEEP_CHANGE, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		auto disableSleepBtn = (lv_obj_t *)event_handler_arg;
+		(disableSleep ? lv_obj_add_state : lv_obj_clear_state)(disableSleepBtn, LV_STATE_CHECKED);
+	}, disableSleepBtn);
+
+	lv_obj_add_event_cb(disableSleepBtn, [](lv_event_t *e) {
+		setDisableSleep(!disableSleep);
+	}, LV_EVENT_CLICKED, nullptr);
 }
