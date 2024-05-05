@@ -49,6 +49,7 @@ static duk_ret_t js_getAccelerometer(duk_context *ctx) {
 }
 
 extern bool disableSleep;
+void setDisableSleep(bool value);
 
 static duk_ret_t js_disableSleep_getter(duk_context *ctx) {
 	duk_push_boolean(ctx, disableSleep);
@@ -56,7 +57,7 @@ static duk_ret_t js_disableSleep_getter(duk_context *ctx) {
 }
 
 static duk_ret_t js_disableSleep_setter(duk_context *ctx) {
-	disableSleep = duk_get_boolean(ctx, 0);
+	setDisableSleep(duk_get_boolean(ctx, 0));
 	return 0;
 }
 
