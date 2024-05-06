@@ -48,19 +48,6 @@ static duk_ret_t js_getAccelerometer(duk_context *ctx) {
 	return 1;
 }
 
-extern bool disableSleep;
-void setDisableSleep(bool value);
-
-static duk_ret_t js_disableSleep_getter(duk_context *ctx) {
-	duk_push_boolean(ctx, disableSleep);
-	return 1;
-}
-
-static duk_ret_t js_disableSleep_setter(duk_context *ctx) {
-	setDisableSleep(duk_get_boolean(ctx, 0));
-	return 0;
-}
-
 void duktape_watch_install(duk_context *ctx) {
 	duk_push_c_function(ctx, js_print, DUK_VARARGS);
 	duk_put_global_string(ctx, "print");
@@ -74,13 +61,6 @@ void duktape_watch_install(duk_context *ctx) {
 	duk_put_global_string(ctx, "setBrightness");
 	duk_push_c_function(ctx, js_getAccelerometer, 0);
 	duk_put_global_string(ctx, "getAccelerometer");
-
-	duk_push_global_object(ctx);
-	duk_push_string(ctx, "disableSleep");
-	duk_push_c_function(ctx, js_disableSleep_getter, 0);
-	duk_push_c_function(ctx, js_disableSleep_setter, 1);
-	duk_def_prop(ctx, -4, DUK_DEFPROP_HAVE_GETTER | DUK_DEFPROP_HAVE_SETTER);
-	duk_pop(ctx);
 
 	void duktape_watch_install_http(duk_context *ctx);
 	duktape_watch_install_http(ctx);

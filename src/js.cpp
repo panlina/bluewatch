@@ -2,6 +2,7 @@
 #include <duktape.h>
 #include <duktape_lvgl.h>
 #include <DuktapeWatch.h>
+#include <duktape_bluewatch.h>
 #include <SPIFFS.h>
 
 duk_context *jsContext;
@@ -11,6 +12,7 @@ void setupJs()
 	jsContext = duk_create_heap_default();
 	duktape_lvgl_install(jsContext);
 	duktape_watch_install(jsContext);
+	duktape_bluewatch_install(jsContext);
 	void loadLibraries();
 	loadLibraries();
 }
