@@ -25,8 +25,10 @@ static duk_ret_t js_writeFile(duk_context *ctx) {
 }
 
 void duktape_watch_install_fs(duk_context *ctx) {
+	duk_push_object(ctx);
 	duk_push_c_function(ctx, js_readFile, 1);
-	duk_put_global_string(ctx, "readFile");
+	duk_put_prop_string(ctx, -2, "readFile");
 	duk_push_c_function(ctx, js_writeFile, 2);
-	duk_put_global_string(ctx, "writeFile");
+	duk_put_prop_string(ctx, -2, "writeFile");
+	duk_put_global_string(ctx, "fs");
 }
