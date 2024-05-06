@@ -4,6 +4,7 @@
 #include "setting.h"
 #include "json.h"
 #include "wifi_.h"
+#include "sleep.h"
 #include "Modal.h"
 #include <tuple>
 #include <utility>
@@ -176,9 +177,6 @@ void setupSettingPanel() {
 	lv_obj_set_style_bg_opa(disableSleepBtn, LV_OPA_100, LV_PART_MAIN | LV_STATE_CHECKED);
 	auto disableSleepLabel = lv_label_create(disableSleepBtn);
 	lv_label_set_text(disableSleepLabel, "Disable Sleep");
-
-	extern bool disableSleep;
-	void setDisableSleep(bool value);
 
 	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_DISABLE_SLEEP_CHANGE, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
 		auto disableSleepBtn = (lv_obj_t *)event_handler_arg;
