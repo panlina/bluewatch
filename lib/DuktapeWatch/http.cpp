@@ -26,7 +26,6 @@ static Response http(const char *method, String url, String *payload)
 }
 
 static duk_ret_t js_http(duk_context *ctx) {
-	auto nargs = duk_get_top(ctx);
 	auto method = duk_get_string(ctx, 0);
 	auto url = duk_get_string(ctx, 1);
 	auto payload = duk_get_string(ctx, 2);
