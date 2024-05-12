@@ -4,7 +4,7 @@
 #include "sleep.h"
 #include "wifi_.h"
 #include "js.h"
-#include "jsServer.h"
+#include "webServer_.h"
 
 const char *ntpServer1 = "pool.ntp.org";
 const char *ntpServer2 = "time.nist.gov";
@@ -32,7 +32,7 @@ void setup()
 	watch.enableAccelerometer();
 
 	setupJs();
-	setupJsServer();
+	setupWebServer();
 }
 
 void loop()
@@ -40,7 +40,7 @@ void loop()
 	lv_task_handler();
 	sleepHandler();
 	watchfaceHandler();
-	jsServer.handleClient();
+	webServer.handleClient();
 
 	delay(5);
 }
