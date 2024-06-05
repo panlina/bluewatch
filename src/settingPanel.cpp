@@ -68,14 +68,20 @@ void setupSettingPanel() {
 	lv_obj_set_style_text_color(settingPanel, lv_color_white(), LV_PART_MAIN);
 	lv_obj_set_flex_flow(settingPanel, LV_FLEX_FLOW_COLUMN);
 
+	static lv_style_t toggleBtnStyle;
+	lv_style_init(&toggleBtnStyle);
+	lv_style_set_bg_color(&toggleBtnStyle, lv_color_white());
+	lv_style_set_bg_opa(&toggleBtnStyle, LV_OPA_20);
+	static lv_style_t toggleBtnCheckedStyle;
+	lv_style_init(&toggleBtnCheckedStyle);
+	auto colorPrimary = lv_theme_get_color_primary(nullptr);
+	lv_style_set_bg_color(&toggleBtnCheckedStyle, colorPrimary);
+	lv_style_set_bg_opa(&toggleBtnCheckedStyle, LV_OPA_100);
+
 	auto wifiBtn = lv_btn_create(settingPanel);
 	lv_obj_set_width(wifiBtn, LV_PCT(100));
-	// TODO: extract style
-	lv_obj_set_style_bg_color(wifiBtn, lv_color_white(), LV_PART_MAIN);
-	lv_obj_set_style_bg_opa(wifiBtn, LV_OPA_20, LV_PART_MAIN);
-	auto colorPrimary = lv_theme_get_color_primary(wifiBtn);
-	lv_obj_set_style_bg_color(wifiBtn, colorPrimary, LV_PART_MAIN | LV_STATE_CHECKED);
-	lv_obj_set_style_bg_opa(wifiBtn, LV_OPA_100, LV_PART_MAIN | LV_STATE_CHECKED);
+	lv_obj_add_style(wifiBtn, &toggleBtnStyle, LV_PART_MAIN);
+	lv_obj_add_style(wifiBtn, &toggleBtnCheckedStyle, LV_PART_MAIN | LV_STATE_CHECKED);
 	auto wifiLabel = lv_label_create(wifiBtn);
 	lv_label_set_text(wifiLabel, LV_SYMBOL_WIFI " Not Connected");
 	auto arrowLabel = lv_label_create(wifiBtn);
@@ -163,18 +169,15 @@ void setupSettingPanel() {
 
 	auto batteryBtn = lv_btn_create(settingPanel);
 	lv_obj_set_width(batteryBtn, LV_PCT(100));
-	lv_obj_set_style_bg_color(batteryBtn, lv_color_white(), LV_PART_MAIN);
-	lv_obj_set_style_bg_opa(batteryBtn, LV_OPA_20, LV_PART_MAIN);
+	lv_obj_add_style(batteryBtn, &toggleBtnStyle, LV_PART_MAIN);
 	auto batteryLabel = lv_label_create(batteryBtn);
 	lv_label_set_text_fmt(batteryLabel, "%s %d%%", LV_SYMBOL_BATTERY_FULL, watch.getBatteryPercent());
 	// TODO: update battery periodically
 
 	auto disableSleepBtn = lv_btn_create(settingPanel);
 	lv_obj_set_width(disableSleepBtn, LV_PCT(100));
-	lv_obj_set_style_bg_color(disableSleepBtn, lv_color_white(), LV_PART_MAIN);
-	lv_obj_set_style_bg_opa(disableSleepBtn, LV_OPA_20, LV_PART_MAIN);
-	lv_obj_set_style_bg_color(disableSleepBtn, colorPrimary, LV_PART_MAIN | LV_STATE_CHECKED);
-	lv_obj_set_style_bg_opa(disableSleepBtn, LV_OPA_100, LV_PART_MAIN | LV_STATE_CHECKED);
+	lv_obj_add_style(disableSleepBtn, &toggleBtnStyle, LV_PART_MAIN);
+	lv_obj_add_style(disableSleepBtn, &toggleBtnCheckedStyle, LV_PART_MAIN | LV_STATE_CHECKED);
 	auto disableSleepLabel = lv_label_create(disableSleepBtn);
 	lv_label_set_text(disableSleepLabel, "Disable Sleep");
 
