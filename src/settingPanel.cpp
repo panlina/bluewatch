@@ -22,7 +22,7 @@ void setupSettingPanel() {
 	settingPanel = lv_obj_create(lv_scr_act());
 	lv_obj_set_size(settingPanel, LV_PCT(100), LV_PCT(100));
 	lv_obj_set_style_pad_all(settingPanel, 20, LV_PART_MAIN);
-	lv_obj_set_style_border_width(settingPanel, 0, LV_PART_MAIN);
+	lv_obj_set_style_border_side(settingPanel, LV_BORDER_SIDE_NONE, LV_PART_MAIN);
 	lv_obj_set_style_radius(settingPanel, 0, LV_PART_MAIN);
 	lv_obj_set_style_bg_color(settingPanel, lv_color_hex(0x333333), LV_PART_MAIN);
 	lv_obj_set_style_bg_opa(settingPanel, LV_OPA_70, LV_PART_MAIN);
