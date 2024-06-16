@@ -14,6 +14,8 @@ void setupWatchface()
 {
 	extern lv_obj_t *watchfaceTile;
 	watchface = lv_obj_create(watchfaceTile);
+	lv_obj_set_style_border_side(watchface, LV_BORDER_SIDE_NONE, LV_PART_MAIN);
+	lv_obj_set_style_radius(watchface, 0, LV_PART_MAIN);
 	lv_obj_set_size(watchface, LV_PCT(100), LV_PCT(100));
 	lv_obj_set_style_pad_all(watchface, 0, 0);
 

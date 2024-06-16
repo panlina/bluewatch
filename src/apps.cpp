@@ -9,6 +9,8 @@ static void loadApps();
 void setupApps()
 {
 	list = lv_obj_create(appsTile);
+	lv_obj_set_style_border_side(list, LV_BORDER_SIDE_NONE, LV_PART_MAIN);
+	lv_obj_set_style_radius(list, 0, LV_PART_MAIN);
 	lv_obj_set_size(list, LV_PCT(100), LV_PCT(100));
 	lv_obj_set_flex_flow(list, LV_FLEX_FLOW_ROW_WRAP);
 	lv_obj_align(list, LV_ALIGN_CENTER, 0, 0);
