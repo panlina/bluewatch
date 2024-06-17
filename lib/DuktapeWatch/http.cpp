@@ -35,15 +35,20 @@ static duk_ret_t js_http(duk_context *ctx) {
 	auto response = http(method, url, payload ? &payloadString : nullptr);
 
 	if (response.code < 0)
-		duk_generic_error(ctx, "http exception. error code: %d.", response.code);
-	if (response.code >= 400)
-		duk_generic_error(ctx, "http exception. error code: %d.%s", response.code, response.body ? ('\n' + response.body).c_str() : "");
+		duk_push_error_object(ctx, DUK_ERR_TYPE_ERROR, "http exception. error code: %d.", response.code);
+	else if (response.code >= 400)
+		duk_push_error_object(ctx, DUK_ERR_TYPE_ERROR, "http exception. error code: %d.%s", response.code, response.body ? ('\n' + response.body).c_str() : "");
+	else
+		duk_push_object(ctx);
 
-	duk_push_object(ctx);
 	duk_push_int(ctx, response.code);
 	duk_put_prop_string(ctx, -2, "code");
 	duk_push_string(ctx, response.body.c_str());
 	duk_put_prop_string(ctx, -2, "body");
+
+	if (response.code < 0 || response.code >= 400)
+		duk_throw(ctx);
+
 	return 1;
 }
 
