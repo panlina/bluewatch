@@ -172,7 +172,11 @@ void setupSettingPanel() {
 	lv_obj_add_style(batteryBtn, &toggleBtnStyle, LV_PART_MAIN);
 	auto batteryLabel = lv_label_create(batteryBtn);
 	lv_label_set_text_fmt(batteryLabel, "%s %d%%", LV_SYMBOL_BATTERY_FULL, watch.getBatteryPercent());
-	// TODO: update battery periodically
+
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_BATTERY_UPDATE, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		auto batteryLabel = (lv_obj_t *)event_handler_arg;
+		lv_label_set_text_fmt(batteryLabel, "%s %d%%", LV_SYMBOL_BATTERY_FULL, watch.getBatteryPercent());
+	}, batteryLabel);
 
 	auto disableSleepBtn = lv_btn_create(settingPanel);
 	lv_obj_set_width(disableSleepBtn, LV_PCT(100));
