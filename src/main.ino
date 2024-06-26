@@ -2,6 +2,7 @@
 #include <LV_Helper.h>
 #include "ui.h"
 #include "sleep.h"
+#include "battery.h"
 #include "wifi_.h"
 #include "js.h"
 #include "webServer_.h"
@@ -24,6 +25,7 @@ void setup()
 
 	setupUi();
 	setupSleep();
+	setupBattery();
 
 	configTime(timezone * 3600, 0, ntpServer1, ntpServer2);
 
@@ -39,6 +41,7 @@ void loop()
 {
 	lv_task_handler();
 	sleepHandler();
+	batteryHandler();
 	watchfaceHandler();
 	webServer.handleClient();
 

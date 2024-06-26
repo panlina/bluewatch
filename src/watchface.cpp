@@ -1,10 +1,10 @@
 #include <LilyGoLib.h>
 #include <WiFi.h>
+#include "event.h"
 
 lv_obj_t *watchface, *timeLabel, *dateLabel, *statusBar, *batteryLabel, *wifiLabel;
 
 unsigned long timeLastUpdateTime;
-unsigned long batteryLastUpdateTime;
 
 void updateTime();
 void updateBatteryStatus();
@@ -53,7 +53,9 @@ void setupWatchface()
 	updateTime();
 	timeLastUpdateTime = now;
 	updateBatteryStatus();
-	batteryLastUpdateTime = now;
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_BATTERY_UPDATE, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		updateBatteryStatus();
+	}, nullptr);
 	updateWifiStatus();
 }
 
@@ -64,11 +66,6 @@ void watchfaceHandler()
 	if (now - timeLastUpdateTime >= 1000) {
 		updateTime();
 		timeLastUpdateTime = now;
-	}
-
-	if (now - batteryLastUpdateTime >= 60 * 1000) {
-		updateBatteryStatus();
-		batteryLastUpdateTime = now;
 	}
 }
 
