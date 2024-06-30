@@ -2,12 +2,13 @@
 #include <WiFi.h>
 #include "event.h"
 
-lv_obj_t *watchface, *timeLabel, *dateLabel, *statusBar, *batteryLabel, *wifiLabel;
+lv_obj_t *watchface, *timeLabel, *dateLabel, *statusBar, *batteryLabel, *chargeLabel, *wifiLabel;
 
 unsigned long timeLastUpdateTime;
 
 void updateTime();
 void updateBatteryStatus();
+void updateChargeStatus();
 void updateWifiStatus();
 
 void setupWatchface()
@@ -35,6 +36,8 @@ void setupWatchface()
 	lv_obj_set_flex_align(statusBar, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 	lv_obj_set_style_border_width(statusBar, 0, LV_PART_MAIN);
 	lv_obj_set_style_text_font(statusBar, &lv_font_montserrat_24, LV_PART_MAIN);
+	chargeLabel = lv_label_create(statusBar);
+	lv_label_set_text(chargeLabel, LV_SYMBOL_CHARGE);
 	batteryLabel = lv_label_create(statusBar);
 	wifiLabel = lv_label_create(statusBar);
 
@@ -55,6 +58,19 @@ void setupWatchface()
 	updateBatteryStatus();
 	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_BATTERY_UPDATE, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
 		updateBatteryStatus();
+	}, nullptr);
+	updateChargeStatus();
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_VBUS_INSERT, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		updateChargeStatus();
+	}, nullptr);
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_VBUS_REMOVE, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		updateChargeStatus();
+	}, nullptr);
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_BATTERY_CHARGE_DONE, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		updateChargeStatus();
+	}, nullptr);
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_BATTERY_CHARGE_START, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		updateChargeStatus();
 	}, nullptr);
 	updateWifiStatus();
 }
@@ -93,6 +109,11 @@ void updateBatteryStatus()
 		batteryPercentage > 10 ? LV_SYMBOL_BATTERY_1 :
 		LV_SYMBOL_BATTERY_EMPTY
 	);
+}
+
+void updateChargeStatus()
+{
+	(watch.isCharging() ? lv_obj_clear_flag : lv_obj_add_flag)(chargeLabel, LV_OBJ_FLAG_HIDDEN);
 }
 
 void updateWifiStatus()

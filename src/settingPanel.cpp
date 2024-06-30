@@ -170,6 +170,8 @@ void setupSettingPanel() {
 	auto batteryBtn = lv_btn_create(settingPanel);
 	lv_obj_set_width(batteryBtn, LV_PCT(100));
 	lv_obj_add_style(batteryBtn, &toggleBtnStyle, LV_PART_MAIN);
+	lv_obj_set_flex_flow(batteryBtn, LV_FLEX_FLOW_ROW);
+
 	auto batteryLabel = lv_label_create(batteryBtn);
 	lv_label_set_text_fmt(batteryLabel, "%s %d%%", LV_SYMBOL_BATTERY_FULL, watch.getBatteryPercent());
 
@@ -177,6 +179,27 @@ void setupSettingPanel() {
 		auto batteryLabel = (lv_obj_t *)event_handler_arg;
 		lv_label_set_text_fmt(batteryLabel, "%s %d%%", LV_SYMBOL_BATTERY_FULL, watch.getBatteryPercent());
 	}, batteryLabel);
+
+	auto chargeLabel = lv_label_create(batteryBtn);
+	lv_label_set_text(chargeLabel, LV_SYMBOL_CHARGE);
+	(watch.isCharging() ? lv_obj_clear_flag : lv_obj_add_flag)(chargeLabel, LV_OBJ_FLAG_HIDDEN);
+
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_VBUS_INSERT, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		auto chargeLabel = (lv_obj_t *)event_handler_arg;
+		(watch.isCharging() ? lv_obj_clear_flag : lv_obj_add_flag)(chargeLabel, LV_OBJ_FLAG_HIDDEN);
+	}, chargeLabel);
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_VBUS_REMOVE, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		auto chargeLabel = (lv_obj_t *)event_handler_arg;
+		(watch.isCharging() ? lv_obj_clear_flag : lv_obj_add_flag)(chargeLabel, LV_OBJ_FLAG_HIDDEN);
+	}, chargeLabel);
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_BATTERY_CHARGE_DONE, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		auto chargeLabel = (lv_obj_t *)event_handler_arg;
+		(watch.isCharging() ? lv_obj_clear_flag : lv_obj_add_flag)(chargeLabel, LV_OBJ_FLAG_HIDDEN);
+	}, chargeLabel);
+	esp_event_handler_register(BLUEWATCH_EVENTS, BLUEWATCH_EVENT_BATTERY_CHARGE_START, [](void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+		auto chargeLabel = (lv_obj_t *)event_handler_arg;
+		(watch.isCharging() ? lv_obj_clear_flag : lv_obj_add_flag)(chargeLabel, LV_OBJ_FLAG_HIDDEN);
+	}, chargeLabel);
 
 	auto disableSleepBtn = lv_btn_create(settingPanel);
 	lv_obj_set_width(disableSleepBtn, LV_PCT(100));
