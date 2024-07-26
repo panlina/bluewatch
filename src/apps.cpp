@@ -55,9 +55,9 @@ static void createApp(const char *name)
 }
 
 extern lv_obj_t *tileview, *appsTile;
-lv_obj_t *appTile;
-void enterAppTile();
-void (*onLeaveAppTile)();
+static lv_obj_t *appTile;
+static void enterAppTile();
+static void (*onLeaveAppTile)();
 
 void enterApp(const char *source) {
 	onLeaveAppTile = []() {
@@ -90,7 +90,7 @@ void enterApp(const char *source) {
 	duk_pop(jsContext);
 }
 
-void enterAppTile() {
+static void enterAppTile() {
 	appTile = lv_tileview_add_tile(tileview, 2, 0, LV_DIR_HOR);
 	lv_obj_set_tile_id(tileview, 2, 0, LV_ANIM_ON);
 
